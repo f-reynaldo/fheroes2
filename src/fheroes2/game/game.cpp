@@ -321,7 +321,7 @@ void Game::EnvironmentSoundMixer()
         }
     }
 
-    AudioManager::playLoopSoundsAsync( std::move( soundEffects ) );
+    AudioManager::playLoopSounds( std::move( soundEffects ) );
 }
 
 void Game::restoreSoundsForCurrentFocus()
@@ -336,7 +336,8 @@ void Game::restoreSoundsForCurrentFocus()
         const int heroIndexPos = focusedHero->GetIndex();
         if ( heroIndexPos >= 0 ) {
             Game::EnvironmentSoundMixer();
-            AudioManager::PlayMusicAsync( MUS::FromGround( world.getTile( heroIndexPos ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+            Game::EnvironmentSoundMixer();
+            AudioManager::PlayMusic( MUS::FromGround( world.GetTiles( heroIndexPos ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
         }
         break;
     }
@@ -346,7 +347,8 @@ void Game::restoreSoundsForCurrentFocus()
         assert( focusedCastle != nullptr );
 
         Game::EnvironmentSoundMixer();
-        AudioManager::PlayMusicAsync( MUS::FromGround( world.getTile( focusedCastle->GetIndex() ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+            Game::EnvironmentSoundMixer();
+            AudioManager::PlayMusic( MUS::FromGround( world.GetTiles( heroIndexPos ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
         break;
     }
 

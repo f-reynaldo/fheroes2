@@ -453,7 +453,7 @@ namespace
         // This method is called by the worker thread, but is not protected by _mutex
         void executeTask() override
         {
-            const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+            // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
             if ( !isInitialized ) {
                 return;
@@ -616,7 +616,7 @@ namespace
 
 void Audio::Init()
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( isInitialized ) {
         // If this assertion blows up you are trying to initialize an already initialized system.
@@ -698,7 +698,7 @@ void Audio::Init()
     savedMixerVolume = 0;
     savedMusicVolume = 0;
 
-    musicRestartManager.createWorker();
+    // musicRestartManager.createWorker();
 
     Mix_ChannelFinished( channelFinished );
     Mix_HookMusicFinished( musicFinished );
@@ -709,7 +709,7 @@ void Audio::Init()
 void Audio::Quit()
 {
     {
-        const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+        // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
         if ( !isInitialized ) {
             // Nothing to do.
@@ -750,7 +750,7 @@ void Audio::Quit()
 
 void Audio::Mute()
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( isMuted || !isInitialized ) {
         return;
@@ -768,7 +768,7 @@ void Audio::Mute()
 
 void Audio::Unmute()
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isMuted || !isInitialized ) {
         return;
@@ -795,7 +795,7 @@ void Mixer::SetChannels( const int num )
         return;
     }
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -834,7 +834,7 @@ int Mixer::Play( const uint8_t * ptr, const uint32_t size, const bool loop, cons
         return -1;
     }
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return -1;
@@ -895,7 +895,7 @@ int Mixer::Play( const uint8_t * ptr, const uint32_t size, const bool loop, cons
 
 void Mixer::setPosition( const int channelId, const int16_t angle, const uint8_t distance )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -910,7 +910,7 @@ void Mixer::setVolume( const int volumePercentage )
 {
     const int volume = normalizeToSDLVolume( volumePercentage );
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -928,7 +928,7 @@ void Mixer::setVolume( const int volumePercentage )
 
 void Mixer::Stop( const int channelId /* = -1 */ )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -941,14 +941,14 @@ void Mixer::Stop( const int channelId /* = -1 */ )
 
 bool Mixer::isPlaying( const int channelId )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     return isInitialized && Mix_Playing( channelId ) > 0;
 }
 
 bool Music::Play( const uint64_t musicUID, const PlaybackMode playbackMode )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return false;
@@ -971,7 +971,7 @@ void Music::Play( const uint64_t musicUID, const std::vector<uint8_t> & v, const
         return;
     }
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -991,7 +991,7 @@ void Music::Play( const uint64_t musicUID, const std::string & file, const Playb
         return;
     }
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -1012,7 +1012,7 @@ void Music::SetFadeInMs( const int timeMs )
         return;
     }
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     musicFadeInMs = timeMs;
 }
@@ -1021,7 +1021,7 @@ void Music::setVolume( const int volumePercentage )
 {
     const int volume = normalizeToSDLVolume( volumePercentage );
 
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -1037,7 +1037,7 @@ void Music::setVolume( const int volumePercentage )
 
 void Music::Stop()
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -1076,14 +1076,14 @@ void Music::Stop()
 
 bool Music::isPlaying()
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     return isInitialized && Mix_PlayingMusic();
 }
 
 void Music::setMidiSoundFonts( const ListFiles & files )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;
@@ -1110,7 +1110,7 @@ void Music::setMidiSoundFonts( const ListFiles & files )
 
 void Music::setMidiTimidityCfg( const std::string & path )
 {
-    const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+    // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
     if ( !isInitialized ) {
         return;

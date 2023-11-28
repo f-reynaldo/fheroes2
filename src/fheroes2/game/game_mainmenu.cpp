@@ -244,12 +244,17 @@ void Game::runMainGameLoop()
     }
 }
 
+void Game::mainGameLoop()
+{
+    runMainGameLoop();
+}
+
 fheroes2::GameMode Game::MainMenu( const bool isFirstGameRun )
 {
     // Stop all sounds, but not the music
     AudioManager::stopSounds();
 
-    AudioManager::PlayMusicAsync( MUS::MAINMENU, Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+    AudioManager::PlayMusic( MUS::MAINMENU, Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
 
     Settings & conf = Settings::Get();
 
@@ -288,8 +293,21 @@ fheroes2::GameMode Game::MainMenu( const bool isFirstGameRun )
             }
         }
 
-        conf.resetFirstGameRun();
-        conf.Save( Settings::configFileName );
+        fheroes2::Text header( _( "Please Remember" ), fheroes2::FontType::normalYellow() );
+
+        fheroes2::MultiFontText body;
+        body.add( { _( "You can always change the language, resolution and settings of the game by clicking on the " ), fheroes2::FontType::normalWhite() } );
+        body.add( { _( "door" ), fheroes2::FontType::normalYellow() } );
+        body.add( { _( " on the left side of the Main Menu, or with the " ), fheroes2::FontType::normalWhite() } );
+        body.add( { _( "CONFIG" ), fheroes2::FontType::normalYellow() } );
+        body.add( { _( " button from the " ), fheroes2::FontType::normalWhite() } );
+        body.add( { _( "NEW GAME" ), fheroes2::FontType::normalYellow() } );
+        body.add( { _( " menu. \n\nEnjoy the game!" ), fheroes2::FontType::normalWhite() } );
+
+        fheroes2::showMessage( header, body, Dialog::OK );
+
+        //conf.resetFirstGameRun();
+        //conf.Save( Settings::configFileName );
     }
 
     outputMainMenuInTextSupportMode();

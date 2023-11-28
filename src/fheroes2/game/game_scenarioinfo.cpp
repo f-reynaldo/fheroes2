@@ -506,7 +506,7 @@ fheroes2::GameMode Game::SelectScenario( const uint8_t humanPlayerCount )
 {
     assert( humanPlayerCount >= 1 && humanPlayerCount <= 6 );
 
-    AudioManager::PlayMusicAsync( MUS::MAINMENU, Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+    AudioManager::PlayMusic( MUS::MAINMENU, Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
 
     MapsFileInfoList maps = Maps::getAllMapFileInfos( humanPlayerCount );
     if ( maps.empty() ) {
