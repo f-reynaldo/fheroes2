@@ -20,7 +20,7 @@ You can find a complete list of all of our changes and enhancements in [**its ow
 
 Please follow the [**installation guide**](docs/INSTALL.md) to download and install fheroes2.
 
-[![Github Downloads](https://img.shields.io/github/downloads/ihhub/fheroes2/total.svg)](https://github.com/ihhub/fheroes2/releases)
+[![Github Downloads](https://img.shields.io/github/downloads/ihhub/fheroes2/total.svg)](https://github.com/f-reynaldo/fheroes2/releases)
 
 ## WebAssembly / Emscripten build
 
@@ -38,7 +38,9 @@ cd emsdk
 source ./emsdk_env.sh
 ```
 
-You also need `cmake`, `make` and the original Heroes of Might and Magic II data files. fheroes2 does not include the copyrighted game resources. See the [installation guide](docs/INSTALL.md) for information about obtaining supported game data.
+You also need `cmake` and `make`. **Do not install a native SDL2 development package for this build.** Emscripten provides SDL2, SDL2_mixer and zlib as Emscripten ports. The Emscripten build therefore does not use the repository's native `FindSDL2.cmake` / `FindSDL2_mixer.cmake` package discovery; CMake creates the SDL targets required by the project and Emscripten supplies the actual libraries and headers.
+
+You also need the original Heroes of Might and Magic II data files. fheroes2 does not include the copyrighted game resources. See the [installation guide](docs/INSTALL.md) for information about obtaining supported game data.
 
 ### Build
 
@@ -57,6 +59,8 @@ cd build
 emcmake cmake ..
 cmake --build . -j$(nproc)
 ```
+
+The CMake step uses Emscripten's SDL2 and SDL2_mixer ports directly; there is no `apt install libsdl2-dev` step and no separate SDL2 SDK to install.
 
 The final browser application is linked with Emscripten. From the build directory, use the link command documented in [EMSCRIPTEN.md](EMSCRIPTEN.md). It produces an `index.html` launcher together with the JavaScript, WebAssembly and preloaded data files required by the application.
 
@@ -142,20 +146,20 @@ If you would like to help translating the project, please read the [**translatio
 
 ## Donation
 
-We accept donations via [**Patreon**](https://www.patreon.com/fheroes2), [**PayPal**](https://www.paypal.com/paypalme/fheroes2) or [**Boosty**](https://boosty.to/fheroes2). All donations will be used only for the future project development as we do not
+We accept donations via [**Patreon**](https://www.patreon.com/fheroes2), [**PayPal**](https://www.paypal.com/paypalme/fheroes2) or [**Boosty**](https://boosty.to/fheroes2) . All donations will be used only for the future project development as we do not
 consider this project as a source of income by any means.
 
 [![Donate](https://img.shields.io/badge/Donate-Patreon-green.svg)](https://www.patreon.com/fheroes2)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/fheroes2)
-[![Donate](https://img.shields.io/badge/Donate-Boosty-green.svg)](https://boosty.to/fheroes2)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/fheroes2)
 
 ## Contacts
 
 Follow us on social networks: [**Facebook**](https://www.facebook.com/groups/fheroes2) or [**VK**](https://vk.com/fheroes2).
-We also have a [**Discord**](https://discord.gg/xF85vbZ) server to discuss the development of the project.
+We also have a [**Discord**](https://discord.gg/xF85vbZ) server to discuss the project.
 
 [![Facebook](https://img.shields.io/badge/Facebook-blue.svg)](https://www.facebook.com/groups/fheroes2)
-[![VK](https://img.shields.io/badge/VK-blue.svg)](https://vk.com/fheroes2)
+[![VK](https://img.shields.io/badge(VK-fff.svg)](https://vk.com/fheroes2)
 [![Discord](https://img.shields.io/discord/733093692860137523.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/xF85vbZ)
 
 ## FAQ
