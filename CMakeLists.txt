@@ -14,8 +14,8 @@
 #                                                                         #
 #   You should have received a copy of the GNU General Public License     #
 #   along with this program; if not, write to the                         #
-#   Free Software Foundation, Inc.,                                       #
-#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             #
+#   Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,       #
+#   Boston, MA 02110-1301 USA.                                            #
 ###########################################################################
 
 cmake_minimum_required(VERSION 3.20)
@@ -25,8 +25,11 @@ file(STRINGS ${CMAKE_SOURCE_DIR}/version.txt FHEROES2_VERSION LIMIT_COUNT 1 REGE
 
 project(fheroes2 VERSION ${FHEROES2_VERSION} LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-flto -sUSE_SDL_MIXER=2 -sUSE_ZLIB")
+if(EMSCRIPTEN)
+	set(CMAKE_CXX_FLAGS "-flto -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sUSE_ZLIB")
+else()
+	set(CMAKE_CXX_FLAGS "-flto")
+endif()
 set(CMAKE_BUILD_TYPE Release)
 
 include(CMakeDependentOption)
@@ -57,11 +60,14 @@ set_property(CACHE USE_SDL_VERSION PROPERTY STRINGS SDL2)
 # Library & feature detection
 #
 if(EMSCRIPTEN)
-	# Emscripten provides SDL2, SDL2_mixer and zlib as ports selected by the
-	# Emscripten linker flags. There are no native CMake package files to find.
-	# Provide the SDL2 target expected by the engine CMakeLists instead.
+	# Emscripten supplies SDL2, SDL2_mixer and zlib as ports. It does not
+	# provide the native SDL2 CMake package files expected by find_package().
+	# Provide the imported targets required by the existing project targets.
 	if(NOT TARGET ${USE_SDL_VERSION}::${USE_SDL_VERSION})
 		add_library(${USE_SDL_VERSION}::${USE_SDL_VERSION} INTERFACE IMPORTED)
+	endif()
+	if(NOT TARGET ${USE_SDL_VERSION}::${USE_SDL_VERSION}main)
+		add_library(${USE_SDL_VERSION}::${USE_SDL_VERSION}main INTERFACE IMPORTED)
 	endif()
 else()
 	find_package(${USE_SDL_VERSION} REQUIRED)
@@ -186,7 +192,7 @@ if(NOT MACOS_APP_BUNDLE)
 			)
 		install(
 			FILES script/homm2/extract_homm2_resources.bat script/homm2/extract_homm2_resources.ps1
-			DESTINATION ${CMAKE_INSTALL_DOCDIR}/demo
+			DESTINATION ${CMAKE_INSTALL_DOCDIR}/homm2
 			)
 		install(
 			FILES script/homm2/resource_extraction_toolset.bat script/homm2/resource_extraction_toolset.ps1
