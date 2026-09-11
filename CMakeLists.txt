@@ -21,7 +21,7 @@
 cmake_minimum_required(VERSION 3.20)
 cmake_policy(SET CMP0074 NEW)
 
-file(STRINGS ${CMAKE_SOURCE_DIR}/version.txt FHEROES2_VERSION LIMIT_COUNT 1 REGEX "^[0-9]+\.[0-9]+\.[0-9]+$")
+file(STRINGS ${CMAKE_SOURCE_DIR}/version.txt FHEROES2_VERSION LIMIT_COUNT 1 REGEX "^[0-9]+\\.[0-9]+\\.[0-9]+$")
 
 project(fheroes2 VERSION ${FHEROES2_VERSION} LANGUAGES C CXX)
 
@@ -56,10 +56,19 @@ set_property(CACHE USE_SDL_VERSION PROPERTY STRINGS SDL2)
 #
 # Library & feature detection
 #
-find_package(${USE_SDL_VERSION} REQUIRED)
-find_package(${USE_SDL_VERSION}_mixer)
-find_package(ZLIB)
-#find_package(Threads)
+if(EMSCRIPTEN)
+	# Emscripten provides SDL2, SDL2_mixer and zlib as ports selected by the
+	# Emscripten linker flags. There are no native CMake package files to find.
+	# Provide the SDL2 target expected by the engine CMakeLists instead.
+	if(NOT TARGET ${USE_SDL_VERSION}::${USE_SDL_VERSION})
+		add_library(${USE_SDL_VERSION}::${USE_SDL_VERSION} INTERFACE IMPORTED)
+	endif()
+else()
+	find_package(${USE_SDL_VERSION} REQUIRED)
+	find_package(${USE_SDL_VERSION}_mixer)
+	find_package(ZLIB)
+	#find_package(Threads)
+endif()
 
 # TODO: Modern versions of SDL2* packages provide the CMake config files that define the SDL2::SDL2, SDL2_mixer::SDL2_mixer and SDL2_image::SDL2_image
 # TODO: imported targets, but older versions do not. To solve this problem, we have to use FindSDL2*.cmake modules from the cmake/ subdirectory and
@@ -177,7 +186,7 @@ if(NOT MACOS_APP_BUNDLE)
 			)
 		install(
 			FILES script/homm2/extract_homm2_resources.bat script/homm2/extract_homm2_resources.ps1
-			DESTINATION ${CMAKE_INSTALL_DOCDIR}/homm2
+			DESTINATION ${CMAKE_INSTALL_DOCDIR}/demo
 			)
 		install(
 			FILES script/homm2/resource_extraction_toolset.bat script/homm2/resource_extraction_toolset.ps1
