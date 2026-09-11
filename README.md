@@ -22,6 +22,96 @@ Please follow the [**installation guide**](docs/INSTALL.md) to download and inst
 
 [![Github Downloads](https://img.shields.io/github/downloads/ihhub/fheroes2/total.svg)](https://github.com/ihhub/fheroes2/releases)
 
+## WebAssembly / Emscripten build
+
+This branch contains an experimental browser build of fheroes2 using Emscripten. The generated application runs entirely in the browser.
+
+### Prerequisites
+
+Install the Emscripten SDK (emsdk) and activate an environment that provides `emcmake` and `em++`:
+
+```bash
+git clone https://github.com/emscripten-core/emsdk.git
+cd emsdk
+./emsdk install latest
+./emsdk activate latest
+source ./emsdk_env.sh
+```
+
+You also need `cmake`, `make` and the original Heroes of Might and Magic II data files. fheroes2 does not include the copyrighted game resources. See the [installation guide](docs/INSTALL.md) for information about obtaining supported game data.
+
+### Build
+
+Clone this repository and switch to the `emscripten` branch:
+
+```bash
+git clone --branch emscripten https://github.com/f-reynaldo/fheroes2.git
+cd fheroes2
+```
+
+Configure and compile the project:
+
+```bash
+mkdir build
+cd build
+emcmake cmake ..
+cmake --build . -j$(nproc)
+```
+
+The final browser application is linked with Emscripten. From the build directory, use the link command documented in [EMSCRIPTEN.md](EMSCRIPTEN.md). It produces an `index.html` launcher together with the JavaScript, WebAssembly and preloaded data files required by the application.
+
+### Game data
+
+The browser build needs the original HoMM II resources in the directories preloaded by the Emscripten linker:
+
+- `data/`
+- `maps/`
+- `files/`
+
+The exact link command in [EMSCRIPTEN.md](EMSCRIPTEN.md) packages these directories into the browser application's virtual filesystem. Make sure the required game data is present before linking.
+
+### Host locally
+
+Do not normally open `index.html` directly with `file://`, because browsers restrict WebAssembly and data loading in that mode. Serve the generated files through an HTTP server instead.
+
+For example, from the directory containing the generated `index.html`:
+
+```bash
+python3 -m http.server 8080
+```
+
+Then open:
+
+```text
+http://localhost:8080/
+```
+
+Any other static web server works as well, including nginx, Apache, Caddy or GitHub Pages.
+
+### Deploy
+
+The generated output is a static web application. Upload all generated files together to the same web server directory, including:
+
+- `index.html`
+- the generated `.js` file
+- the generated `.wasm` file
+- the Emscripten preloaded data file(s)
+
+Do not rename or omit generated files unless you also update the references emitted by Emscripten.
+
+### Persistent saves and configuration
+
+This branch uses Emscripten `IDBFS` backed by the browser's IndexedDB. fheroes2 user data is loaded before the application starts and synchronized back to browser storage periodically and when the page is hidden or unloaded.
+
+This persists, per browser and per website origin:
+
+- fheroes2 configuration
+- save games
+
+Browser data is tied to the site's origin. For example, `localhost:8080` and a production domain use separate IndexedDB storage. Clearing the site's browser storage also removes the persisted configuration and save games.
+
+For implementation and linker details, see [EMSCRIPTEN.md](EMSCRIPTEN.md).
+
 ## Copyright
 
 All rights for the original game and its resources belong to former The 3DO Company. These rights were transferred to Ubisoft.
