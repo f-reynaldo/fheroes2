@@ -4,7 +4,9 @@ Module['preRun'] = Module['preRun'] || [];
 Module['preRun'].push(function () {
     const persistentDirectory = '/fheroes2';
 
-    // fheroes2's Linux path code uses HOME/XDG_CONFIG_HOME/XDG_DATA_HOME.
+    // Emscripten's ENV object is not necessarily exposed until runtime setup.
+    // Initialize it here so the Linux getenv() implementation sees these values.
+    globalThis.ENV = globalThis.ENV || {};
     Object.assign(globalThis.ENV, {
         HOME: persistentDirectory,
         XDG_CONFIG_HOME: persistentDirectory + '/.config',
