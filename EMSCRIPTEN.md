@@ -2,10 +2,12 @@
 
 ## Docker
 
+```
 docker run --rm -it \
   -v /home/$USER/heroes2/fheroes2:/code/fheroes2 \  
   -w /code \
   emscripten/emsdk:latest \
+```
 
 ## Build
 
