@@ -65,7 +65,7 @@ if [ -d "$REPO_ROOT/dgguspat" ] && [ -n "$(ls -A "$REPO_ROOT/dgguspat" 2>/dev/nu
     PRELOAD_ARGS+=(--preload-file "$REPO_ROOT/dgguspat@/etc/timidity")
 fi
 
-echo "==> Linking with persistent IDBFS..."
+echo "==> Linking with persistent IDBFS and custom HTML shell..."
 em++ -flto -O3 "${OBJ_FILES[@]}" \
     "$LIBENGINE" "$LIBSMACKER" \
     -o index.html \
@@ -75,10 +75,11 @@ em++ -flto -O3 "${OBJ_FILES[@]}" \
     -sINCOMING_MODULE_JS_API=preRun \
     -lidbfs.js \
     --pre-js "$REPO_ROOT/emscripten_persistence.js" \
+    --shell-file "$REPO_ROOT/shell.html" \
     "${PRELOAD_ARGS[@]}" \
     --closure 1
 
 echo
 echo "Build complete: $BUILD_DIR/index.html"
-echo "Persistent config and saves use browser IndexedDB under /fheroes2."
+echo "Persistent config and saves use browser IndexedDB under /home/web_user."
 echo "To play: cd $BUILD_DIR && python3 -m http.server 8000"
