@@ -1,10 +1,13 @@
 // Persist fheroes2 user configuration and save games in browser IndexedDB.
+// IDBFS is resolved from the Emscripten filesystem object so Closure can
+// correctly compile this pre-js file.
 Module.preRun = Module.preRun || [];
 Module.preRun.push(function () {
     const persistentDirectory = '/home/web_user';
+    const idbfs = FS.filesystems.IDBFS;
 
     FS.mkdirTree(persistentDirectory);
-    FS.mount(IDBFS, {}, persistentDirectory);
+    FS.mount(idbfs, {}, persistentDirectory);
 
     addRunDependency('fheroes2-idbfs-load');
     FS.syncfs(true, function (error) {
@@ -21,6 +24,7 @@ Module.preRun.push(function () {
         if (syncing) {
             return;
         }
+
         syncing = true;
         FS.syncfs(false, function (error) {
             syncing = false;
@@ -32,7 +36,6 @@ Module.preRun.push(function () {
 
     setInterval(sync, 2000);
     window.addEventListener('pagehide', sync);
-    window.addEventListener('beforeunload', sync);
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden') {
             sync();
