@@ -3,10 +3,7 @@
 # build-web.sh — builds fheroes2 for the web via Emscripten.
 #
 # Run this from the repo root (the directory containing CMakeLists.txt),
-# inside the emsdk container, e.g.:
-#
-#   docker run --rm -it -v $(pwd):/code/fheroes2 -w /code/fheroes2 \
-#       emscripten/emsdk:latest bash build-web.sh
+# inside the emsdk container.
 
 set -euo pipefail
 
@@ -41,18 +38,12 @@ echo "Game data found. Proceeding with build..."
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-echo "==> Building Emscripten ports (sdl2, sdl2_mixer, zlib)..."
 embuilder build sdl2
 embuilder build sdl2_mixer
 embuilder build zlib
-
-echo "==> Configuring with emcmake..."
 emcmake cmake ..
-
-echo "==> Compiling..."
 emmake make -j"$(nproc)"
 
-echo "==> Locating build artifacts..."
 mapfile -t OBJ_FILES < <(find . -path '*fheroes2.dir*' -name '*.o')
 if [ "${#OBJ_FILES[@]}" -eq 0 ]; then
     echo "No object files found under build/."
@@ -74,21 +65,19 @@ if [ -d "$REPO_ROOT/dgguspat" ] && [ -n "$(ls -A "$REPO_ROOT/dgguspat" 2>/dev/nu
     PRELOAD_ARGS+=(--preload-file "$REPO_ROOT/dgguspat@/etc/timidity")
 fi
 
-echo "==> Linking..."
+echo "==> Linking with persistent IDBFS..."
 em++ -flto -O3 "${OBJ_FILES[@]}" \
     "$LIBENGINE" "$LIBSMACKER" \
     -o index.html \
     -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mid"]' \
     -sUSE_ZLIB -sASYNCIFY -sASYNCIFY_STACK_SIZE=81920 \
     -sINITIAL_MEMORY=256MB -sENVIRONMENT=web -sFORCE_FILESYSTEM=1 \
+    -lidbfs.js \
     --pre-js "$REPO_ROOT/emscripten_persistence.js" \
     "${PRELOAD_ARGS[@]}" \
     --closure 1
 
 echo
 echo "Build complete: $BUILD_DIR/index.html"
-echo "Persistent config and saves use browser IndexedDB."
-echo
-echo "To play:"
-echo "  cd $BUILD_DIR && python3 -m http.server 8000"
-echo "Then open http://localhost:8000/index.html"
+echo "Persistent config and saves use browser IndexedDB under /fheroes2."
+echo "To play: cd $BUILD_DIR && python3 -m http.server 8000"
