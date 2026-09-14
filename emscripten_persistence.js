@@ -1,44 +1,28 @@
 // Persist fheroes2 user configuration and save games in browser IndexedDB.
-// IDBFS is resolved from the Emscripten filesystem object so Closure can
-// correctly compile this pre-js file.
+// Keep all user-writable fheroes2 files below one IDBFS mount.
 Module.preRun = Module.preRun || [];
 Module.preRun.push(function () {
-    const persistentDirectory = '/home/web_user';
-    const idbfs = FS.filesystems.IDBFS;
+    const persistentDirectory = '/fheroes2';
+
+    // fheroes2's Linux path code uses HOME/XDG_CONFIG_HOME/XDG_DATA_HOME.
+    // Force those paths into the IDBFS mount so configuration and saves are
+    // guaranteed to be persistent rather than ending up in MEMFS.
+    Object.assign(ENV, {
+        HOME: persistentDirectory,
+        XDG_CONFIG_HOME: persistentDirectory + '/.config',
+        XDG_DATA_HOME: persistentDirectory + '/.local/share'
+    });
 
     FS.mkdirTree(persistentDirectory);
-    FS.mount(idbfs, {}, persistentDirectory);
+    FS.mount(IDBFS, { root: '/', autoPersist: true }, persistentDirectory);
 
     addRunDependency('fheroes2-idbfs-load');
     FS.syncfs(true, function (error) {
         if (error) {
             console.error('Unable to load persistent fheroes2 data:', error);
         } else {
-            console.log('Loaded persistent fheroes2 data from IndexedDB');
+            console.log('Loaded persistent fheroes2 data from IndexedDB at ' + persistentDirectory);
         }
         removeRunDependency('fheroes2-idbfs-load');
-    });
-
-    let syncing = false;
-    const sync = function () {
-        if (syncing) {
-            return;
-        }
-
-        syncing = true;
-        FS.syncfs(false, function (error) {
-            syncing = false;
-            if (error) {
-                console.error('Unable to save persistent fheroes2 data:', error);
-            }
-        });
-    };
-
-    setInterval(sync, 2000);
-    window.addEventListener('pagehide', sync);
-    document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'hidden') {
-            sync();
-        }
     });
 });
