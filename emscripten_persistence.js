@@ -1,17 +1,9 @@
 // Persist fheroes2 user configuration and save games in browser IndexedDB.
-// Keep all user-writable fheroes2 files below one IDBFS mount.
+// Mount the Emscripten default HOME directly so fheroes2's existing Linux
+// config/data path logic stays inside IDBFS without requiring ENV overrides.
 Module['preRun'] = Module['preRun'] || [];
 Module['preRun'].push(function () {
-    const persistentDirectory = '/fheroes2';
-
-    // Emscripten's ENV object is not necessarily exposed until runtime setup.
-    // Initialize it here so the Linux getenv() implementation sees these values.
-    globalThis.ENV = globalThis.ENV || {};
-    Object.assign(globalThis.ENV, {
-        HOME: persistentDirectory,
-        XDG_CONFIG_HOME: persistentDirectory + '/.config',
-        XDG_DATA_HOME: persistentDirectory + '/.local/share'
-    });
+    const persistentDirectory = '/home/web_user';
 
     FS.mkdirTree(persistentDirectory);
     FS.mount(IDBFS, { root: '/' }, persistentDirectory);
