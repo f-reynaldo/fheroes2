@@ -3,7 +3,7 @@
 # build-web.sh — builds fheroes2 for the web via Emscripten.
 #
 # Run this from the repo root (the directory containing CMakeLists.txt),
-# inside the emsdk container.
+# inside the emscripten/emsdk container.
 
 set -euo pipefail
 
@@ -72,6 +72,7 @@ em++ -flto -O3 "${OBJ_FILES[@]}" \
     -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mid"]' \
     -sUSE_ZLIB -sASYNCIFY -sASYNCIFY_STACK_SIZE=81920 \
     -sINITIAL_MEMORY=256MB -sENVIRONMENT=web -sFORCE_FILESYSTEM=1 \
+    -sINCOMING_MODULE_JS_API=preRun \
     -lidbfs.js \
     --pre-js "$REPO_ROOT/emscripten_persistence.js" \
     "${PRELOAD_ARGS[@]}" \
