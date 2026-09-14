@@ -14,7 +14,7 @@ Module['preRun'].push(function () {
     });
 
     FS.mkdirTree(persistentDirectory);
-    FS.mount(IDBFS, { root: '/', autoPersist: true }, persistentDirectory);
+    FS.mount(IDBFS, { root: '/' }, persistentDirectory);
 
     console.log('fheroes2 persistence: mounting IDBFS at ' + persistentDirectory);
 
@@ -27,4 +27,17 @@ Module['preRun'].push(function () {
         }
         removeRunDependency('fheroes2-idbfs-load');
     });
+
+    // Flush native filesystem changes to IndexedDB regularly. This is more
+    // robust than relying solely on autoPersist, especially for applications
+    // that perform many writes in a short period of time.
+    const syncPersistentFilesystem = function () {
+        FS.syncfs(false, function (error) {
+            if (error) {
+                console.error('fheroes2 persistence: unable to save IndexedDB data:', error);
+            }
+        });
+    };
+
+    setInterval(syncPersistentFilesystem, 1000);
 });
