@@ -8,7 +8,7 @@ Module['preRun'].push(function () {
     FS.mkdirTree(persistentDirectory);
     FS.mount(IDBFS, { root: '/' }, persistentDirectory);
 
-    window.fheroes2FS = FS;
+    Module['fheroes2FS'] = FS;
 
     console.log('fheroes2 persistence: mounting IDBFS at ' + persistentDirectory);
 
