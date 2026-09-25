@@ -74,7 +74,6 @@ em++ -flto -O3 "${OBJ_FILES[@]}" \
     -sINITIAL_MEMORY=256MB -sENVIRONMENT=web -sFORCE_FILESYSTEM=1 \
     -sINCOMING_MODULE_JS_API=preRun \
     -lidbfs.js \
-    --pre-js "$REPO_ROOT/emscripten_persistence.js" \
     --shell-file "$REPO_ROOT/shell.html" \
     "${PRELOAD_ARGS[@]}" \
     --closure 1
