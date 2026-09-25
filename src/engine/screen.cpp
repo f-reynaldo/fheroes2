@@ -1194,6 +1194,12 @@ namespace
 #endif
 
             uint32_t flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+#if defined( __EMSCRIPTEN__ )
+            // Browser fullscreen requires a user-generated event. Do not honor the
+            // persisted fullscreen preference during startup, otherwise Emscripten
+            // defers the request until the first mouse/keyboard event.
+            isFullScreen = false;
+#endif
             if ( isFullScreen ) {
 #if defined( _WIN32 )
                 // We force fullscreen at desktop resolution for nearest scaling to disable hardware scaling of game resolution by the monitor.
