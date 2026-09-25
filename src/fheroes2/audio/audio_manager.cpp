@@ -832,6 +832,19 @@ namespace AudioManager
         PlayMusicAsync( _music, Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
     }
 
+    void playLoopSounds( std::map<M82::SoundType, std::vector<AudioLoopEffectInfo>> soundEffects )
+    {
+        if ( !Audio::isValid() ) {
+            return;
+        }
+
+        g_asyncSoundManager.removeAllSoundTasks();
+
+        const std::scoped_lock<std::recursive_mutex> lock( g_asyncSoundManager.resourceMutex() );
+
+        playLoopSoundsImpl( std::move( soundEffects ), Settings::Get().is3DAudioEnabled() );
+    }
+
     void playLoopSoundsAsync( std::map<M82::SoundType, std::vector<AudioLoopEffectInfo>> soundEffects )
     {
         if ( !Audio::isValid() ) {
