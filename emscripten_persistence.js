@@ -16,6 +16,14 @@ Module['preRun'].push(function () {
             console.error('fheroes2 persistence: unable to load IndexedDB:', error);
         } else {
             console.log('fheroes2 persistence: loaded IndexedDB data');
+            try {
+                console.log(
+                    'fheroes2 config:',
+                    FS.readFile('/home/web_user/.fheroes2/fheroes2.cfg', { encoding: 'utf8' })
+                );
+            } catch (configError) {
+                console.log('fheroes2 config not found yet:', configError);
+            }
         }
         removeRunDependency('fheroes2-idbfs-load');
     });
