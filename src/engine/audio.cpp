@@ -104,7 +104,7 @@ namespace
 
     // This mutex protects all operations with audio. In order to avoid deadlocks, it shouldn't
     // be acquired in any callback functions that can be called by SDL_Mixer.
-    std::recursive_mutex audioMutex;
+    //std::recursive_mutex audioMutex;
 
     class SoundSampleManager
     {
@@ -158,7 +158,7 @@ namespace
         {
             assert( channelId >= 0 );
 
-            const std::scoped_lock<std::mutex> lock( _channelsToCleanupMutex );
+            //const std::scoped_lock<std::mutex> lock( _channelsToCleanupMutex );
 
             _channelsToCleanup.push_back( channelId );
         }
@@ -168,7 +168,7 @@ namespace
             std::vector<int> channelsToCleanup;
 
             {
-                const std::scoped_lock<std::mutex> lock( _channelsToCleanupMutex );
+                //const std::scoped_lock<std::mutex> lock( _channelsToCleanupMutex );
 
                 std::swap( channelsToCleanup, _channelsToCleanup );
             }
@@ -193,7 +193,7 @@ namespace
 
         std::vector<int> _channelsToCleanup;
         // This mutex protects operations with _channelsToCleanup
-        std::mutex _channelsToCleanupMutex;
+        //std::mutex _channelsToCleanupMutex;
     };
 
     SoundSampleManager soundSampleManager;
@@ -427,21 +427,42 @@ namespace
 
     void playMusic( const uint64_t musicUID, Music::PlaybackMode playbackMode );
 
-    class MusicRestartManager final : public MultiThreading::AsyncManager
+    class MusicRestartManager final //: public MultiThreading::AsyncManager
     {
     public:
         void restartCurrentMusicTrack()
         {
-            const std::scoped_lock<std::mutex> lock( _mutex );
+            //const std::scoped_lock<std::mutex> lock( _mutex );
 
-            _trackChangeCounter = musicTrackManager.getCurrentTrackChangeCounter();
+            //_trackChangeChangeCounter = musicTrackManager.getCurrentTrackChangeCounter();
 
-            notifyWorker();
+            //notifyWorker();
+
+            if ( !isInitialized ) {
+                return;
+            }
+
+            // The current track managed to change during the start of this task
+            /*if ( _taskTrackChangeCounter != musicTrackManager.getCurrentTrackChangeCounter() ) {
+                return;
+            }*/
+
+            // REWIND_AND_PLAY_INFINITE should be handled by the SDL_Mixer itself
+            if ( musicTrackManager.getCurrentTrackPlaybackMode() != Music::PlaybackMode::RESUME_AND_PLAY_INFINITE ) {
+                return;
+            }
+
+            const std::shared_ptr<MusicInfo> currentTrack = musicTrackManager.getCurrentTrack().lock();
+            assert( currentTrack );
+
+            currentTrack->setPosition( 0 );
+
+            playMusic( musicTrackManager.getCurrentTrackUID(), musicTrackManager.getCurrentTrackPlaybackMode() );
         }
 
     private:
         // This method is called by the worker thread and is protected by _mutex
-        bool prepareTask() override
+        bool prepareTask() //override
         {
             // Make a copy for the worker thread to ensure that this counter will
             // not be changed by another thread in the middle of executeTask()
@@ -451,7 +472,7 @@ namespace
         }
 
         // This method is called by the worker thread, but is not protected by _mutex
-        void executeTask() override
+        void executeTask() //override
         {
             // const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
 
@@ -745,7 +766,7 @@ void Audio::Quit()
     // thread is already waiting on it, then there will be a deadlock while waiting
     // for it to join. The Mix_HookMusicFinished()'s callback can no longer be called
     // at the moment because it has been already unregistered.
-    musicRestartManager.stopWorker();
+    //musicRestartManager.stopWorker();
 }
 
 void Audio::Mute()
@@ -848,6 +869,12 @@ int Mixer::Play( const uint8_t * ptr, const uint32_t size, const bool loop, cons
         return -1;
     }
 
+    //const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+
+    if ( !isInitialized ) {
+        return -1;
+    }
+
     std::unique_ptr<Mix_Chunk, void ( * )( Mix_Chunk * )> sample( Mix_LoadWAV_RW( rwops.get(), 0 ), Mix_FreeChunk );
     if ( !sample ) {
         ERROR_LOG( "Failed to create an audio chunk from memory. The error: " << Mix_GetError() )
@@ -924,6 +951,36 @@ void Mixer::setVolume( const int volumePercentage )
     }
 
     Mix_Volume( -1, volume );
+
+    if ( channelId < 0 ) {
+        std::fill( savedMixerVolumes.begin(), savedMixerVolumes.end(), volume );
+        return;
+    }
+
+    const size_t channel = static_cast<size_t>( channelId );
+
+    if ( channel < savedMixerVolumes.size() ) {
+        savedMixerVolumes[channel] = volume;
+    }
+}
+
+void Mixer::Pause( const int channelId /* = -1 */ )
+{
+    //const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+
+    if ( isInitialized ) {
+        Mix_Pause( channelId );
+    }
+}
+
+void Mixer::Resume( const int channelId /* = -1 */ )
+{
+    //const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
+
+    if ( isInitialized ) {
+        Mix_Resume( channelId );
+    }
+}
 }
 
 void Mixer::Stop( const int channelId /* = -1 */ )
