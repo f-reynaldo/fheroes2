@@ -2,6 +2,27 @@
 // Mount the Emscripten default HOME directly so fheroes2's existing Linux
 // config/data path logic stays inside IDBFS without requiring ENV overrides.
 Module['preRun'] = Module['preRun'] || [];
+
+Module['fheroes2ReadDir'] = function (path) {
+    return FS.readdir(path);
+};
+
+Module['fheroes2ReadFile'] = function (path) {
+    return FS.readFile(path, { encoding: 'utf8' });
+};
+
+Module['fheroes2WriteFile'] = function (path, contents) {
+    FS.writeFile(path, contents);
+};
+
+Module['fheroes2SyncFS'] = function () {
+    FS.syncfs(false, function (error) {
+        if (error) {
+            console.error('fheroes2 persistence: unable to save IndexedDB data:', error);
+        }
+    });
+};
+
 Module['preRun'].push(function () {
     const persistentDirectory = '/home/web_user';
 
