@@ -65,7 +65,7 @@ if [ -d "$REPO_ROOT/dgguspat" ] && [ -n "$(ls -A "$REPO_ROOT/dgguspat" 2>/dev/nu
     PRELOAD_ARGS+=(--preload-file "$REPO_ROOT/dgguspat@/etc/timidity")
 fi
 
-echo "==> Linking with persistent IDBFS and custom HTML shell..."
+echo "==> Linking with persistent IDBFS..."
 em++ -flto -O3 "${OBJ_FILES[@]}" \
     "$LIBENGINE" "$LIBSMACKER" \
     -o index.html \
@@ -74,7 +74,7 @@ em++ -flto -O3 "${OBJ_FILES[@]}" \
     -sINITIAL_MEMORY=256MB -sENVIRONMENT=web -sFORCE_FILESYSTEM=1 \
     -sINCOMING_MODULE_JS_API=preRun \
     -lidbfs.js \
-    --shell-file "$REPO_ROOT/shell.html" \
+    --pre-js "$REPO_ROOT/emscripten_persistence.js" \
     "${PRELOAD_ARGS[@]}" \
     --closure 1
 
