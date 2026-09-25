@@ -951,37 +951,8 @@ void Mixer::setVolume( const int volumePercentage )
     }
 
     Mix_Volume( -1, volume );
-
-    if ( channelId < 0 ) {
-        std::fill( savedMixerVolumes.begin(), savedMixerVolumes.end(), volume );
-        return;
-    }
-
-    const size_t channel = static_cast<size_t>( channelId );
-
-    if ( channel < savedMixerVolumes.size() ) {
-        savedMixerVolumes[channel] = volume;
-    }
 }
 
-void Mixer::Pause( const int channelId /* = -1 */ )
-{
-    //const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
-
-    if ( isInitialized ) {
-        Mix_Pause( channelId );
-    }
-}
-
-void Mixer::Resume( const int channelId /* = -1 */ )
-{
-    //const std::scoped_lock<std::recursive_mutex> lock( audioMutex );
-
-    if ( isInitialized ) {
-        Mix_Resume( channelId );
-    }
-}
-}
 
 void Mixer::Stop( const int channelId /* = -1 */ )
 {
