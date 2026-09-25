@@ -252,7 +252,6 @@ Castle::CastleDialogReturnValue Castle::OpenDialog( const bool openConstructionW
 
 
     AudioManager::PlayMusic( MUS::FromRace( _race ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
-    AudioManager::PlayMusic( MUS::FromRace( race ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
 
     int alphaHero = 255;
     CastleDialog::FadeBuilding fadeBuilding;
