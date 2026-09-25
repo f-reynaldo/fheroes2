@@ -81,7 +81,7 @@ void Interface::AdventureMap::SetFocus( Heroes * hero, const bool retainScrollBa
     const int heroIndex = hero->GetIndex();
     if ( Game::UpdateSoundsOnFocusUpdate() && heroIndex >= 0 ) {
         Game::EnvironmentSoundMixer();
-        AudioManager::PlayMusicAsync( MUS::FromGround( world.getTile( heroIndex ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+        AudioManager::PlayMusic( MUS::FromGround( world.getTile( heroIndex ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
     }
 }
 
@@ -113,7 +113,7 @@ void Interface::AdventureMap::SetFocus( Castle * castle )
 
     if ( Game::UpdateSoundsOnFocusUpdate() ) {
         Game::EnvironmentSoundMixer();
-        AudioManager::PlayMusicAsync( MUS::FromGround( world.getTile( castle->GetIndex() ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
+        AudioManager::PlayMusic( MUS::FromGround( world.getTile( castle->GetIndex() ).GetGround() ), Music::PlaybackMode::RESUME_AND_PLAY_INFINITE );
     }
 }
 

@@ -559,7 +559,7 @@ fheroes2::GameMode GameOver::Result::checkGameOver()
                 Video::ShowVideo( { { "WIN.SMK", Video::VideoControl::PLAY_CUTSCENE_WAIT } }, { standardGameResults() }, true );
 
                 // AudioManager::PlayMusic is run here in order to start playing before displaying the high score.
-                AudioManager::PlayMusicAsync( MUS::VICTORY, Music::PlaybackMode::REWIND_AND_PLAY_INFINITE );
+                AudioManager::PlayMusic( MUS::VICTORY, Music::PlaybackMode::REWIND_AND_PLAY_INFINITE );
 
                 return fheroes2::GameMode::HIGHSCORES_STANDARD;
             }

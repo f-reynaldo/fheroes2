@@ -28,6 +28,9 @@ project(fheroes2 VERSION ${FHEROES2_VERSION} LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_CXX_FLAGS "-flto -sUSE_SDL_MIXER=2 -sUSE_ZLIB")
+set(CMAKE_BUILD_TYPE Release)
+
 include(CMakeDependentOption)
 include(GNUInstallDirs)
 
@@ -36,6 +39,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #
 # Compile-time options
 #
+option(ENABLE_STRICT_COMPILATION "Enable strict compilation mode (turns warnings into errors)" OFF)
 option(ENABLE_IMAGE "Enable the use of SDL_image (requires libpng)" OFF)
 option(ENABLE_TOOLS "Enable the build of additional tools" OFF)
 
@@ -55,13 +59,17 @@ set_property(CACHE USE_SDL_VERSION PROPERTY STRINGS SDL2)
 # Library & feature detection
 #
 find_package(${USE_SDL_VERSION} REQUIRED)
-find_package(${USE_SDL_VERSION}_mixer REQUIRED)
-find_package(ZLIB REQUIRED)
-find_package(Threads)
+find_package(${USE_SDL_VERSION}_mixer)
+find_package(ZLIB)
+#find_package(Threads)
+
+# TODO: Modern versions of SDL2* packages provide the CMake config files that define the SDL2::SDL2, SDL2_mixer::SDL2_mixer and SDL2_image::SDL2_image
+# TODO: imported targets, but older versions do not. To solve this problem, we have to use FindSDL2*.cmake modules from the cmake/ subdirectory and
+# TODO: define aliases for imported targets provided by these modules.
 
 if(ENABLE_IMAGE)
-	find_package(${USE_SDL_VERSION}_image REQUIRED)
-	find_package(PNG REQUIRED)
+	find_package(${USE_SDL_VERSION}_image)
+	find_package(PNG)
 endif(ENABLE_IMAGE)
 
 #

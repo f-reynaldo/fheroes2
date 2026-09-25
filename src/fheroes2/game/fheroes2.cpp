@@ -52,6 +52,7 @@
 #include "game_init.h"
 #include "game_invalid_assets.h"
 #include "logging.h"
+#include <emscripten.h>
 
 int main( int argc, char ** argv )
 {
@@ -63,6 +64,8 @@ int main( int argc, char ** argv )
 #else
     (void)argc;
 #endif
+
+   emscripten_set_main_loop(&Game::mainGameLoop, 0, 0);
 
     try {
         auto hardwareComponent = Game::createHardwareComponent();
