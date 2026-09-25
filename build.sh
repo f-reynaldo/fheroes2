@@ -35,6 +35,7 @@ if [ "${#missing[@]}" -gt 0 ]; then
 fi
 
 echo "Game data found. Proceeding with build..."
+rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
